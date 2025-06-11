@@ -1,0 +1,29 @@
+# Dockerfile_debian_slim
+FROM debian:slim
+
+LABEL description="Cefore v0.11.0 on Debian Slim"
+
+RUN apt update && \
+    apt -y upgrade && \
+    DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
+    libssh-dev \
+    make \
+    automake \
+    build-essential \
+    procps \
+    zip \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /tmp
+COPY v0.11.0.zip .
+RUN unzip v0.11.0.zip -d .
+WORKDIR cefore-0.11.0
+
+ENV CEFORE_DIR=/usr/local
+RUN aclocal && \
+    automake && \
+    ./configure --enable-csmgr --enable-cache && \
+    make && \
+    make install && \
+    ldconfig
+
